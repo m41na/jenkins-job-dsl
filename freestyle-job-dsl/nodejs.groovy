@@ -1,6 +1,6 @@
-job('Node js job creator') {
+job('click-counter-generated-job') {
     scm {
-        git('git@github.com:m41na/click-counter.git') { node ->
+        git('https://github.com/m41na/click-counter.git') { node ->
             node / gitConfigName('DSL User')
             node / gitConfigEmail('zes.ty@aol.com')
         }
