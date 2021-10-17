@@ -1,8 +1,8 @@
-job('Node js example') {
+job('Node js job creator') {
     scm {
-        git('git@github.com:m41na/jenkins-job-dsl.git') { node ->
+        git('git@github.com:m41na/click-counter.git') { node ->
             node / gitConfigName('DSL User')
-            node / gitConfigEmail('jenkins-admin@aol.com')
+            node / gitConfigEmail('zes.ty@aol.com')
         }
     }
 
