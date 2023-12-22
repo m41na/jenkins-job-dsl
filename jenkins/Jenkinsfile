@@ -14,4 +14,36 @@ pipeline {
             }
         }
     }
+
+    stages {
+        stage('cleaning workspace...') {
+            steps {
+                cleanWs()
+            }
+        }
+    }
+
+    stages {
+        stage('checkout from scm...') {
+            steps {
+                git branch: 'main', credentials: 'm41na', url: 'https://github.com/m41na/jenkins-job-dsl.git'
+            }
+        }
+    }
+
+    stages {
+        stage('build application...') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+    }
+
+    stages {
+        stage('test application...') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+    }
 }
