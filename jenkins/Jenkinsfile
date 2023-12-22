@@ -10,7 +10,7 @@ pipeline {
         APP_NAME = 'jenkins-job-dsl'
         RELEASE = '1.0.0'
         DOCKER_USER = 'm41na'
-        NEXUS_DOCKER_REPO = '192.168.1.18:8081/repository/docker-nexus/'
+        NEXUS_DOCKER_REPO = '192.168.1.18:8081/repository/docker-nexus'
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         SKIP_STEP = true
