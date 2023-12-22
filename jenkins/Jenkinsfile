@@ -22,7 +22,7 @@ pipeline {
     
         stage('checkout from scm...') {
             steps {
-                git branch: 'main', credentials: 'm41na', url: 'https://github.com/m41na/jenkins-job-dsl.git'
+                git branch: 'main', credentialsId: 'm41na', url: 'https://github.com/m41na/jenkins-job-dsl.git'
             }
         }
     
