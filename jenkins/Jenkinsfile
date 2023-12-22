@@ -10,10 +10,10 @@ pipeline {
         APP_NAME = 'jenkins-job-dsl'
         RELEASE = '1.0.0'
         DOCKER_USER = 'm41na'
-        NEXUS_CREDS = credentials('jenkins-nexus')
-        NEXUS_DOCKER_REPO = 'http://192.168.1.18:8081/repository/docker-nexus/'
+        NEXUS_DOCKER_REPO = '192.168.1.18:8081/repository/docker-nexus/'
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        SKIP_STEP = true
     }
 
     stages {
@@ -69,15 +69,37 @@ pipeline {
         stage('build docker image...'){
             steps {
                 echo 'building docker image'
-                sh "docker build -t $NEXUS_DOCKER_REPO/${IMAGE_NAME} -f docker/Dockerfile."
+                sh "docker build -t $NEXUS_DOCKER_REPO/$IMAGE_NAME -f docker/Dockerfile."
+            }
+        }
+
+        stage('docker login...') {
+            when {
+                expression {
+                    SKIP_STEP == true
+                }
+            }
+            steps {
+                echo 'nexus docker repository login'
+                script{
+                    withCredentials([usernamePassword(credentialsId: 'jenkins-nexus', usernameVariable: 'USER', passwordVariable: 'PASS' )]){
+                       sh ' echo $PASS | docker login -u $USER --password-stdin $NEXUS_DOCKER_REPO'
+                    }
+                   
+                }
             }
         }
 
         stage('publish docker image...') {
+             when {
+                expression {
+                    SKIP_STEP == true
+                }
+            }
             steps {
                 echo 'pushing image to docker hub'
-                sh "docker push $NEXUS_DOCKER_REPO/${IMAGE_NAME}:${IMAGETAG}"
-                sh "docker push $NEXUS_DOCKER_REPO/${IMAGE_NAME}:latest"
+                sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:$IMAGETAG"
+                sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:latest"
             }
         }
     }
