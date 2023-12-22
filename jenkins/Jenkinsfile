@@ -69,7 +69,7 @@ pipeline {
         stage('build docker image...'){
             steps {
                 echo 'building docker image'
-                sh "docker build -t $NEXUS_DOCKER_REPO/$IMAGE_NAME -f docker/Dockerfile."
+                sh "docker build -t $NEXUS_DOCKER_REPO/$IMAGE_NAME -f docker/Dockerfile ."
             }
         }
 
