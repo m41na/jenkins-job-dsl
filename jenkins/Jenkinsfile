@@ -6,6 +6,15 @@ pipeline {
         maven 'maven-3.9.6'
     }
 
+    environment {
+        APP_NAME = 'jenkins-job-dsl'
+        RELEASE = '1.0.0'
+        DOCKER_USER = 'admin'
+        DOCKER_PASS = 'jenkins-nexus'
+        IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+    }
+
     stages {
         stage('checking tools...') {
             steps {
@@ -52,6 +61,21 @@ pipeline {
             steps {
                 script {
                     waitForQualityGate(abortPipeline: false, credentialsId: 'jenkins-token')
+                }
+            }
+        }
+
+        stage('build & publish image...'){
+            steps {
+                script {
+                    docker.withRegistry('', DOCKER_PASS){
+                        docker_image = docker.build "${IMAGE_NAME}"
+                    }
+
+                    docker.withRegistry('', DOCKER_PASS){
+                        docker_image.push "${IMAGETAG}"
+                        docker_image.push "latest"
+                    }
                 }
             }
         }
