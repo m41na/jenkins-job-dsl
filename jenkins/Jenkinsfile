@@ -1,10 +1,16 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'jdk-17'
+        maven 'maven-3.9.6'
+    }
+
     stages {
-        stage('Hello') {
+        stage('checking tools...') {
             steps {
-                echo 'Hello World'
+                sh 'java -version'
+                sh 'mvn -version'
             }
         }
     }
