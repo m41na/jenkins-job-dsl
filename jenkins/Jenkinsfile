@@ -9,8 +9,8 @@ pipeline {
     environment {
         APP_NAME = 'jenkins-job-dsl'
         RELEASE = '1.0.0'
-        DOCKER_USER = 'm41na'
-        NEXUS_DOCKER_REPO = '192.168.1.18:8081/repository/docker-nexus'
+        DOCKER_USER = 'jenkins-user'
+        NEXUS_DOCKER_REPO = '192.168.1.24:8083'
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
         SKIP_STEP = true
@@ -74,16 +74,11 @@ pipeline {
         }
 
         stage('docker login...') {
-            when {
-                expression {
-                    SKIP_STEP == true
-                }
-            }
             steps {
                 echo 'nexus docker repository login'
                 script{
                     withCredentials([usernamePassword(credentialsId: 'jenkins-nexus', usernameVariable: 'USER', passwordVariable: 'PASS' )]){
-                       sh ' echo $PASS | docker login -u $USER --password-stdin $NEXUS_DOCKER_REPO'
+                       sh "echo $PASS | docker login -u $USER --password-stdin $NEXUS_DOCKER_REPO"
                     }
                    
                 }
@@ -98,7 +93,7 @@ pipeline {
             }
             steps {
                 echo 'pushing image to docker hub'
-                sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:$IMAGETAG"
+                sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:$IMAGE_TAG"
                 sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:latest"
             }
         }
