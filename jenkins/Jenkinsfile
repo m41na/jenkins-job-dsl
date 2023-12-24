@@ -10,9 +10,9 @@ pipeline {
         APP_NAME = 'jenkins-job-dsl'
         RELEASE = '1.0.0'
         DOCKER_USER = 'jenkins-user'
-        NEXUS_DOCKER_REPO = '192.168.1.24:8083'
         IMAGE_NAME = "${DOCKER_USER}/${APP_NAME}"
         IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        ARTIFACTORY_JENKINS_REPO = 'http://192.168.1.18:8082/artifactory/jenkins-repository'
         SKIP_STEP = true
     }
 
@@ -95,6 +95,33 @@ pipeline {
                 echo 'pushing image to docker hub'
                 sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:$IMAGE_TAG"
                 sh "docker push $NEXUS_DOCKER_REPO/$IMAGE_NAME:latest"
+            }
+        }
+
+        stage('download artifact...'){
+             when {
+                expression {
+                    SKIP_STEP == true
+                }
+            }
+            steps {
+                echo 'downloading artifact from artifactory'
+                script{
+                    withCredentials([usernamePassword(credentialsId: '	jenkins-user', usernameVariable: 'USER', passwordVariable: 'PASS' )]){
+                        sh "curl -u $USER:$PASS -XGET $ARTIFACTORY_JENKINS_REPO/demo-0.0.1.jar --output demo-0.0.1-download.jar"
+                    }
+                }
+            }
+        }
+
+        stage('upload artifact...'){
+            steps {
+                echo 'uploading artifact to artifactory'
+                script{
+                    withCredentials([usernamePassword(credentialsId: '	jenkins-user', usernameVariable: 'USER', passwordVariable: 'PASS' )]){
+                        sh "curl -u $USER:$PASS -XPUT $ARTIFACTORY_JENKINS_REPO/demo-0.0.1-$BUILD_NUMBER.jar -T target/demo-0.0.1-jar-with-dependencies.jar"
+                    }
+                }
             }
         }
     }
